@@ -11,6 +11,8 @@
 import os
 
 from util import list_all_files
+from acb_ex import parse_acb
+from awb_ex import awb_ex
 from spc_ex import spc_ex
 from rsct_ex import rsct_ex
 from srd_ex import srd_ex
@@ -58,25 +60,32 @@ if __name__ == "__main__":
         continue
       print
     
-    # Extract the SPC files.
+    # Extract the SPC, AWB, and ACB files.
     for filename in files:
       out_file = os.path.join(out_dir, filename[len(base_dir) + 1:])
       
-      if not os.path.splitext(filename)[1].lower() == ".spc":
+      ext1 = os.path.splitext(filename)[1].lower()
+      
+      if not ext1 in [".spc", ".awb", ".acb"]:
         continue
       
       try:
         print "Extracting", filename
-        spc_ex(filename, out_file)
+        if ext1 == ".spc"
+          spc_ex(filename, out_file)
+        elif ext1 == ".awb":
+          awb_ex(filename)
+        elif ext1 == ".acb":
+          parse_acb(filename)
       
       except:
         print "Failed to unpack", filename
     
     # Now extract all the data we know how to from inside the SPC files.
     for filename in list_all_files(out_dir):
-      ext = os.path.splitext(filename)[1].lower()
+      ext2 = os.path.splitext(filename)[1].lower()
       
-      if not ext in [".rsct", ".wrd", ".stx", ".srd"]:
+      if not ext2 in [".rsct", ".wrd", ".stx", ".srd", ".awb", ".acb"]:
         continue
       
       ex_dir, basename = os.path.split(filename)
@@ -92,18 +101,23 @@ if __name__ == "__main__":
       print "Extracting", filename
       print
       
-      if ext == ".rsct":
+      if ext2 == ".rsct":
         rsct_ex(filename, txt_file)
       
-      if ext == ".wrd":
+      if ext2 == ".wrd":
         wrd_ex(filename, txt_file)
       
-      if ext == ".stx":
+      if ext2 == ".stx":
         stx_ex(filename, txt_file)
       
       # Because we have the same extensions used for multiple different formats.
-      if ext == ".srd" or ext == ".stx":
+      if ext2 == ".srd" or ext2 == ".stx":
         srd_ex(filename, ex_dir, crop = args.crop)
+        
+      if ext2 == ".awb":
+        awb_ex(filename)
+      if ext2 == ".acb":
+        parse_acb(filename)
   
   print
   raw_input("Press Enter to exit.")
