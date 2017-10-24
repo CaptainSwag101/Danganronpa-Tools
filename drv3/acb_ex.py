@@ -47,7 +47,7 @@ if __name__ == "__main__":
     # PC demo
     "partition_resident_win_demo",
     
-    PC retail
+    # PC retail
     "partition_resident_win",
   ]
   
