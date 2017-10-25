@@ -109,15 +109,27 @@ def spc_ex_data(f, filename, out_dir):
 
 if __name__ == "__main__":
   dirs = [
-    # Retail data
+    # Vita retail
     "partition_data_vita",
     "partition_resident_vita",
     "partition_patch101_vita",
     "partition_patch102_vita",
     
-    # Demo data
+    # Vita demo
     "partition_data_vita_taiken_ja",
     "partition_resident_vita_taiken_ja",
+    
+    # PC retail
+    "partition_data_win",
+    "partition_data_win_us",
+    "partition_data_win_jp",
+    "partition_resident_win",
+    
+    # PC demo
+    "partition_data_win_demo",
+    "partition_data_win_demo_us",
+    "partition_data_win_demo_jp",
+    "partition_resident_win_demo",
   ]
   
   for dirname in dirs:

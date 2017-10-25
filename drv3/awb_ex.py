@@ -92,16 +92,26 @@ def guess_ext(data):
 
 if __name__ == "__main__":
   files = [
-    # Retail data.
+    # Vita retail
     "partition_resident_vita/sound/BGM.awb",
     "partition_resident_vita/sound/JINGLE.awb",
     "partition_resident_vita/sound/VOICE.awb",
     "partition_patch101_vita/sound/VOICE.awb",
     
-    # Demo data.
+    # Vita demo
     "partition_resident_vita_taiken_ja/sound/BGM.awb",
     "partition_resident_vita_taiken_ja/sound/JINGLE.awb",
     "partition_resident_vita_taiken_ja/sound/VOICE.awb",
+    
+    # PC retail
+    "partition_resident_win/sound/BGM.awb",
+    "partition_resident_win/sound/JINGLE.awb",
+    "partition_resident_win/sound/VOICE.awb",
+    
+    # PC demo
+    "partition_resident_win_demo/sound/BGM.awb",
+    "partition_resident_win_demo/sound/JINGLE.awb",
+    "partition_resident_win_demo/sound/VOICE.awb",
   ]
   
   for fn in files:

@@ -101,6 +101,6 @@ if __name__ == "__main__":
         srd_ex(filename, ex_dir, crop = args.crop)
   
   print
-  raw_input("Press Enter to exit.")
+  #raw_input("Press Enter to exit.")
 
 ### EOF ###

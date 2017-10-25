@@ -60,15 +60,27 @@ def rsct_ex_data(f):
 
 if __name__ == "__main__":
   dirs = [
-    # Retail data
+    # Vita retail
     "dec/partition_data_vita",
     "dec/partition_resident_vita",
     "dec/partition_patch101_vita",
     "dec/partition_patch102_vita",
     
-    # Demo data
+    # Vita demo
     "dec/partition_data_vita_taiken_ja",
     "dec/partition_resident_vita_taiken_ja",
+    
+    # PC retail
+    "dec/partition_data_win",
+    "dec/partition_data_win_us",
+    "dec/partition_data_win_jp",
+    "dec/partition_resident_win",
+    
+    # PC demo
+    "dec/partition_data_win_demo",
+    "dec/partition_data_win_demo_us",
+    "dec/partition_data_win_demo_jp",
+    "dec/partition_resident_win_demo",
   ]
   
   for dirname in dirs:

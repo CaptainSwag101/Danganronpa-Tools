@@ -44,11 +44,11 @@ if __name__ == "__main__":
     # Demo data
     "partition_resident_vita_taiken_ja",
     
-    # PC demo
-    "partition_resident_win_demo",
-    
     # PC retail
     "partition_resident_win",
+    
+    # PC demo
+    "partition_resident_win_demo",
   ]
   
   for base_dir in dirs:
