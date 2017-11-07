@@ -34,7 +34,7 @@ def spc_ex_data(f, filename, out_dir):
     dec = srd_dec_data(f)
     f.close()
     f = BinaryData(dec)
-    magic = f.read(4)
+    magic = f.read(4).decode()
   
   if not magic == SPC_MAGIC:
     f.close()
