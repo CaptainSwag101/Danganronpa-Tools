@@ -31,6 +31,7 @@ if __name__ == "__main__":
   parser.add_argument("input", metavar = "<input dir>", nargs = "+", help = "An input directory.")
   parser.add_argument("-o", "--output", metavar = "<output dir>", help = "The output directory.")
   parser.add_argument("--no-crop", dest = "crop", action = "store_false", help = "Don't crop srd textures to their display dimensions.")
+  parser.add_argument("--no-clobber", dest = "clobber", action = "store_false", help = "Don't overwrite files that already exist.")
   args = parser.parse_args()
   
   for in_path in args.input:
@@ -59,17 +60,20 @@ if __name__ == "__main__":
     
     # Extract the SPC files.
     for filename in files:
-      out_file = os.path.join(out_dir, filename[len(base_dir) + 1:])
+      out_file = os.path.splitext(os.path.join(out_dir, filename[len(base_dir) + 1:]))[0]
+      
+      if args.clobber == False and os.path.isdir(out_file):
+        continue
       
       if not os.path.splitext(filename)[1].lower() == ".spc":
         continue
       
       try:
-        print("Extracting ", filename)
+        print("Extracting", filename)
         spc_ex(filename, out_file)
       
       except:
-        print("Failed to unpack ", filename)
+        print("Failed to unpack", filename)
     
     # Now extract all the data we know how to from inside the SPC files.
     for filename in list_all_files(out_dir):
@@ -82,9 +86,11 @@ if __name__ == "__main__":
       ex_dir   = out_dir + "-ex" + ex_dir[len(out_dir):]
       txt_file = os.path.join(ex_dir, os.path.splitext(basename)[0] + ".txt")
       
+      if args.clobber == False and (os.path.isdir(ex_dir) or os.path.isfile(txt_file)):
+        continue
+      
       print()
-      print("Extracting ", filename)
-      print()
+      print("Extracting", filename)
       
       if ext == ".rsct":
         rsct_ex(filename, txt_file)
@@ -100,6 +106,6 @@ if __name__ == "__main__":
         srd_ex(filename, ex_dir, crop = args.crop)
   
   print()
-  #raw_input("Press Enter to exit.")
+  #input("Press Enter to exit.")
 
 ### EOF ###

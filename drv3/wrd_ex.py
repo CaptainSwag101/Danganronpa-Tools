@@ -6,6 +6,7 @@
 # for more details.
 ################################################################################
 
+from stx_ex import stx_ex_data
 from util import *
 
 def wrd_ex(filename, out_file = None):
@@ -15,7 +16,7 @@ def wrd_ex(filename, out_file = None):
   cmds, strs = wrd_ex_data(f)
   f.close()
   
-  if not strs: # and not cmds:
+  if not strs and not cmds:
     return
   
   out_dir = os.path.dirname(out_file)
@@ -25,19 +26,19 @@ def wrd_ex(filename, out_file = None):
   except:
     pass
   
-  with open(out_file, "wb") as f:
+  with open(out_file, "w") as f:
     if strs:
-      # f.write("########## Strings ##########\n\n")
+      f.write("########## Strings ##########\n\n")
       for i, string in enumerate(strs):
-        f.write(string.encode("utf-8"))
+        f.write(string)
         f.write("\n\n")
     
-    # if cmds:
-    #   f.write("########## Commands ##########\n\n")
-    #   for cmd in cmds:
-    #     f.write(cmd.encode("utf-8"))
-    #     f.write("\n")
-    #   f.write("\n")
+    if cmds:
+      f.write("########## Commands ##########\n\n")
+      for cmd in cmds:
+        f.write(cmd)
+        f.write("\n")
+      f.write("\n")
 
 def wrd_ex_data(f):
   str_count  = f.get_u16()
@@ -52,10 +53,6 @@ def wrd_ex_data(f):
   cmd1_off   = f.get_u32()
   cmd2_off   = f.get_u32()
   str_off    = f.get_u32()
-  
-  # Text is stored externally.
-  if str_off == 0:
-    return None, None
   
   # Code section.
   code = bytearray(f.read(unk_off - 0x20))
@@ -80,17 +77,21 @@ def wrd_ex_data(f):
   # Dialogue strings.
   strs = []
   
-  f.seek(str_off)
-  for i in range(str_count):
-    str_len = f.get_u8()
-    
-    # ┐(´∀｀)┌
-    if str_len >= 0x80:
-      str_len += (f.get_u8() - 1) * 0x80
-    
-    str = f.read(str_len).decode("utf-16le")
-    f.read(2) # Null bytes
-    strs.append(str)
+  # Text is stored externally.
+  if str_off == 0:
+    return None, None
+  else:
+    f.seek(str_off)
+    for i in range(str_count):
+      str_len = f.get_u8()
+      
+      # ┐(´∀｀)┌
+      if str_len >= 0x80:
+        str_len += (f.get_u8() - 1) * 0x80
+      
+      str = f.read(str_len).decode("utf-16le")
+      f.read(2) # Null bytes
+      strs.append(str)
   
   return cmds, strs
   

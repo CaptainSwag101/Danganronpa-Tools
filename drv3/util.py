@@ -60,8 +60,7 @@ class BinaryHelper(object):
         if zero == True:
           break
         else:
-          for i in range(len(ch)):
-            bytes.append(ch[i])
+          bytes.extend(ch)
     
     string = bytes.decode(encoding)
     return string

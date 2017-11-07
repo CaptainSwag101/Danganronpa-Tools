@@ -104,6 +104,8 @@ def spc_ex_data(f, filename, out_dir):
     else:
       with open(os.path.join(out_dir, fn), "wb") as out:
         out.write(data)
+        
+  f.close()
 
 if __name__ == "__main__":
   dirs = [
@@ -135,7 +137,7 @@ if __name__ == "__main__":
       if not os.path.splitext(fn)[1].lower() == ".spc":
         continue
       
-      out_dir = os.path.join("dec", fn)
+      out_dir = os.path.splitext(os.path.join("dec", fn))[0]
       
       print(fn)
       spc_ex(fn, out_dir)

@@ -27,10 +27,10 @@ def stx_ex(filename, out_file = None):
   except:
     pass
   
-  with open(out_file, "wb") as f:
+  with open(out_file, "w") as f:
     for str_id, string in strs:
       f.write("##### %04d\n\n" % str_id)
-      f.write(string.encode("utf-8"))
+      f.write(string)
       f.write("\n\n")
 
 def stx_ex_data(f):
