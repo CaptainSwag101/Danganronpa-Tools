@@ -1,6 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-
-################################################################################
+﻿################################################################################
 # Copyright © 2016-2017 BlackDragonHunt
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To But It's Not My Fault Public
@@ -8,9 +6,9 @@
 # for more details.
 ################################################################################
 
+import io
 import os
 import zlib
-import StringIO
 import struct
 
 class BinaryHelper(object):
@@ -46,29 +44,32 @@ class BinaryHelper(object):
     return to_s16be(self.read(2))
   
   def get_bin(self, length):
-    return BinaryString(self.read(length))
+    return BinaryData(self.read(length))
   
   def get_str(self, bytes_per_char = 1, encoding = "utf-8"):
-    bytes = []
+    bytes = bytearray()
     
     while True:
-      ch = self.read(bytes_per_char)
-      if ch == "\x00" * bytes_per_char:
-        break
-      else:
-        bytes.append(ch)
+        ch = self.read(bytes_per_char)
+        zero = True
+        for i in range(len(ch)):
+          if not ch[i] == 0:
+            zero = False
+            break
+        
+        if zero == True:
+          break
+        else:
+          for i in range(len(ch)):
+            bytes.append(ch[i])
     
-    string = "".join(bytes)
-    
-    if encoding:
-      string = string.decode(encoding)
-    
+    string = bytes.decode(encoding)
     return string
 
-class BinaryFile(file, BinaryHelper):
+class BinaryFile(io.BufferedReader, BinaryHelper):
   pass
 
-class BinaryString(StringIO.StringIO, BinaryHelper):
+class BinaryData(io.BytesIO, BinaryHelper):
   pass
 
 def to_u32(b):

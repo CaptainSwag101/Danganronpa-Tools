@@ -1,6 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-
-################################################################################
+﻿################################################################################
 # Copyright © 2016-2017 BlackDragonHunt
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To But It's Not My Fault Public
@@ -8,6 +6,7 @@
 # for more details.
 ################################################################################
 
+import io
 import os
 from util import to_u32, list_all_files
 
@@ -24,7 +23,7 @@ def dr_dec_file(filename, out_file = None):
   
   with open(filename, "rb") as f:
     
-    if not f.read(4) in [CMP_MAGIC, GX3_MAGIC]:
+    if not f.read(4).decode() in [CMP_MAGIC, GX3_MAGIC]:
       return False
     
     f.seek(0)
@@ -36,7 +35,7 @@ def dr_dec_file(filename, out_file = None):
     return False
   
   # Double compressed.
-  if dec[:4] == GX3_MAGIC:
+  if dec[:4].decode() == GX3_MAGIC:
     dec = dr_dec(dec[4:])
     
   try:
@@ -51,11 +50,11 @@ def dr_dec_file(filename, out_file = None):
 
 def dr_dec(data):
   
-  magic = data[:4]
+  magic = data[:4].decode()
   
   if magic == GX3_MAGIC:
     data = data[4:]
-    magic = data[:4]
+    magic = data[:4].decode()
   
   if not magic == CMP_MAGIC:
     return
@@ -145,25 +144,25 @@ def dr_dec(data):
       p += count
     
     else:
-      print "???"
+      print("???")
   
   if not dec_size == len(res):
-    print "Size mismatch!"
-    print
-    print dec_size, len(res)
-    print
+    print("Size mismatch!")
+    print()
+    print(dec_size, len(res))
+    print()
   
   return res
 
 if __name__ == "__main__":
   import argparse
   
-  print
-  print "*****************************************************************"
-  print "* Danganronpa PS Vita decompressor, written by BlackDragonHunt.  "
-  print "* Special thanks to @FireyFly for helping figure out the format. "
-  print "*****************************************************************"
-  print
+  print()
+  print("******************************************************************")
+  print("* Danganronpa PS Vita decompressor, written by BlackDragonHunt.  *")
+  print("* Special thanks to @FireyFly for helping figure out the format. *")
+  print("******************************************************************")
+  print()
   
   parser = argparse.ArgumentParser(description = "Decompress compressed data in the Danganronpa PS Vita games.")
   parser.add_argument("input", metavar = "<input file|dir>", nargs = "+", help = "An input file or directory.")
@@ -190,26 +189,26 @@ if __name__ == "__main__":
       out_dir = os.path.join(split[0], "dec", split[1])
   
     if out_dir == base_dir:
-      print "Input and output directories are the same:"
-      print " ", out_dir
-      print "Continuing will cause the original data to be overwritten."
-      s = raw_input("Continue? y/n: ")
+      print("Input and output directories are the same:")
+      print(" ", out_dir)
+      print("Continuing will cause the original data to be overwritten.")
+      s = input("Continue? y/n: ")
       if not s[:1].lower() == "y":
         continue
-      print
+      print()
   
     for filename in files:
       out_file = os.path.join(out_dir, filename[len(base_dir) + 1:])
       
       try:
         if dr_dec_file(filename, out_file):
-          print filename
-          print " -->", out_file
+          print(filename)
+          print(" -->", out_file)
       
       except:
-        print "Failed to decompress", filename
+        print("Failed to decompress", filename)
   
-  print
-  raw_input("Press Enter to exit.")
+  print()
+  #input("Press Enter to exit.")
 
 ### EOF ###

@@ -55,7 +55,6 @@ def spc_ex_data(f, filename, out_dir):
     return
   
   for i in range(file_count):
-    
     cmp_flag = f.get_u16()
     unk_flag = f.get_u16()
     cmp_size = f.get_u32()
@@ -71,9 +70,9 @@ def spc_ex_data(f, filename, out_dir):
     fn = f.read(name_len - 1).decode()
     f.read(name_padding + 1)
     
-    # print()
-    # print(cmp_flag, unk_flag, cmp_size, dec_size)
-    # print(fn)
+    #print()
+    #print(cmp_flag, unk_flag, cmp_size, dec_size)
+    #print(fn)
     
     data = f.read(cmp_size)
     f.read(data_padding)
@@ -125,9 +124,9 @@ if __name__ == "__main__":
     "partition_resident_win",
     
     # PC demo
-    #"partition_data_win_demo",
-    #"partition_data_win_demo_us",
-    #"partition_data_win_demo_jp",
+    "partition_data_win_demo",
+    "partition_data_win_demo_us",
+    "partition_data_win_demo_jp",
     "partition_resident_win_demo",
   ]
   

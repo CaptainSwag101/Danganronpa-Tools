@@ -1,6 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-
-################################################################################
+﻿################################################################################
 # Copyright © 2016-2017 BlackDragonHunt
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To But It's Not My Fault Public
@@ -8,6 +6,7 @@
 # for more details.
 ################################################################################
 
+import io
 import os
 from PyQt4 import QtGui
 from PyQt4.QtGui import QImage, qRgba
@@ -26,7 +25,7 @@ def convert_shtx_file(filename, out_file = None):
   
   with open(filename, "rb") as f:
     
-    if not f.read(4) == SHTX_MAGIC:
+    if not f.read(4).decode() == SHTX_MAGIC:
       return False
     
     f.seek(0)
@@ -49,12 +48,12 @@ def convert_shtx_file(filename, out_file = None):
 
 def convert_shtx(data):
   
-  if not data[:4] == SHTX_MAGIC:
+  if not data[:4].decode()  == SHTX_MAGIC:
     return
   
   # Vita = "SHTXFS", PC = "SHTXFs", otherwise data seems to be the same.
   # Handle both variants using the common prefix.
-  if data[:5] == SHTXF_MAGIC:
+  if data[:5].decode()  == SHTXF_MAGIC:
     img = convert_shtx_8bit(data[6:])
   
   else:
@@ -121,9 +120,9 @@ if __name__ == "__main__":
   import argparse
   
   print
-  print "**********************************************"
-  print "* SHTX converter, written by BlackDragonHunt. "
-  print "**********************************************"
+  print("***********************************************")
+  print("* SHTX converter, written by BlackDragonHunt. *")
+  print("***********************************************")
   print
   
   parser = argparse.ArgumentParser(description = "Convert SHTX-formatted images to PNG.")
@@ -153,14 +152,14 @@ if __name__ == "__main__":
       
       try:
         if convert_shtx_file(filename, out_file):
-          print filename
-          print " -->", out_file
-          print
+          print(filename)
+          print(" -->", out_file)
+          print()
       
       except:
-        print "Failed to convert", filename
+        print("Failed to convert", filename)
   
-  print
-  raw_input("Press Enter to exit.")
+  print()
+  #input("Press Enter to exit.")
 
 ### EOF ###

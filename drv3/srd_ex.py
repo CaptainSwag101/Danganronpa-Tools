@@ -1,6 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-
-################################################################################
+﻿################################################################################
 # Copyright © 2016-2017 BlackDragonHunt
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To But It's Not My Fault Public
@@ -8,6 +6,7 @@
 # for more details.
 ################################################################################
 
+import io
 import os
 import math
 
@@ -17,8 +16,7 @@ from swizzle import PostProcessMortonUnswizzle
 from PIL import Image
 
 def read_srd_item(f):
-  
-  data_type   = f.read(4)
+  data_type = f.read(4).decode()
   
   if len(data_type) < 4:
     return None, None, None
@@ -30,7 +28,7 @@ def read_srd_item(f):
   subdata_len = f.get_u32be()
   padding     = f.get_u32be()
   
-  # print data_type, data_len, subdata_len, padding
+  #print(data_type, data_len, subdata_len, padding)
   
   data_padding = (0x10 - data_len % 0x10) % 0x10
   subdata_padding = (0x10 - subdata_len % 0x10) % 0x10
@@ -97,10 +95,11 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
     pal_start, pal_len, _, _ = mipmaps.pop(palette_id)
   
   img_data.seek(name_offset)
-  name = img_data.get_str(encoding = "CP932")
+  name = img_data.get_str()
   
-  print "%4d %4d %2d 0x%02X 0x%02X %3d %3d %3d" % (swiz, scanline, mipmap_count, fmt, unk2, palette, palette_id, unk5), name.encode("UTF-8")
-  # print "0x%02X %2d Mipmaps %3d %3d" % (fmt, mipmap_count, palette, palette_id), name.encode("UTF-8")
+  #print("swiz: %4d scanline: %4d mipmap_count: %2d fmt: 0x%02X unk2: 0x%02X palette: %3d palette_id: %3d unk5: %3d" % (swiz, scanline, mipmap_count, fmt, unk2, palette, palette_id, unk5), name)
+  #print("Format: 0x%02X, Mipmaps: %d, Palette: %d, Palette ID: %d, Name: " % (fmt, mipmap_count, palette, palette_id), name)
+  print("  ", name)
   
   filename_base = os.path.splitext(filename)[0]
   img_filename = filename_base + ".srdv"
@@ -127,7 +126,7 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
       mipmap_start, mipmap_len, mipmap_unk1, mipmap_unk2 = mipmaps[i]
       f.seek(mipmap_start)
       img_data = bytearray(f.read(mipmap_len))
-      print "     %4d %4d 0x%08X 0x%08X" % (disp_width, disp_height, mipmap_start, mipmap_len)
+      #print("     %4d %4d 0x%08X 0x%08X" % (disp_width, disp_height, mipmap_start, mipmap_len))
       
       pal_data = None
       if not pal_start is None:
@@ -176,7 +175,7 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
         for p in old_img_data:
           img_data.extend(pal_data[p * 4 : p * 4 + 4])
       
-      width = scanline / bytespp
+      width = scanline // bytespp
       height = disp_height
       
       if swizzled:
@@ -223,10 +222,10 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
         height = disp_height
       
       if swizzled and width >= 4 and height >= 4:
-        img_data = PostProcessMortonUnswizzle(img_data, width / 4, height / 4, bytespp)
+        img_data = PostProcessMortonUnswizzle(img_data, width // 4, height // 4, bytespp)
     
     else:
-      print "!!!", hex(fmt), "!!!"
+      print("!!!", hex(fmt), "!!!")
       return []
     
     img = Image.frombytes(mode, (width, height), bytes(img_data), decoder, arg)
@@ -249,8 +248,8 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
     
     images.append((mipmap_name, img))
     
-    disp_width = max(1, disp_width / 2)
-    disp_height = max(1, disp_height / 2)
+    disp_width = max(1, disp_width // 2)
+    disp_height = max(1, disp_height // 2)
   
   return images
 
@@ -261,7 +260,7 @@ def read_txi(data, subdata, filename):
 
 def srd_ex(filename, out_dir = None, crop = False):
   out_dir = out_dir or os.path.splitext(filename)[0]
-  f = BinaryFile(filename, "rb")
+  f = BinaryFile(open(filename, "rb"))
   srd_ex_data(f, filename, out_dir, crop)
   f.close()
 
@@ -299,7 +298,7 @@ def srd_ex_data(f, filename, out_dir, crop = False):
         if not name or not img:
           continue
         
-        # out_file = os.path.splitext(os.path.join(subdir, name))[0]
+        #out_file = os.path.splitext(os.path.join(subdir, name))[0]
         out_file = os.path.join(subdir, name)
         
         try:
@@ -314,8 +313,8 @@ def srd_ex_data(f, filename, out_dir, crop = False):
       pass
     
     # Resource information?
-    # elif data_type == "$RSI":
-    #   pass
+    #elif data_type == "$RSI":
+    #  pass
     
     # Vertex?
     elif data_type == "$VTX":
@@ -362,7 +361,7 @@ def srd_ex_data(f, filename, out_dir, crop = False):
       pass
     
     else:
-      print data_type
+      print(data_type)
     
 if __name__ == "__main__":
   dirs = [
@@ -397,9 +396,8 @@ if __name__ == "__main__":
       out_dir = os.path.dirname(fn[len(dirname) + 1:])
       out_dir = os.path.join(dirname + "-ex", out_dir)
       
-      print
-      print fn
-      print
+      print(fn)
       srd_ex(fn, out_dir, crop = True)
+      print()
 
 ### EOF ###

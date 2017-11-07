@@ -1,6 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-
-################################################################################
+﻿################################################################################
 # Copyright © 2016-2017 BlackDragonHunt
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To But It's Not My Fault Public
@@ -13,11 +11,11 @@ from util import *
 def wrd_ex(filename, out_file = None):
   out_file = out_file or os.path.splitext(filename)[0] + ".txt"
   
-  f = BinaryFile(filename, "rb")
+  f = BinaryFile(open(filename, "rb"))
   cmds, strs = wrd_ex_data(f)
   f.close()
   
-  if not strs:# and not cmds:
+  if not strs: # and not cmds:
     return
   
   out_dir = os.path.dirname(out_file)
@@ -31,13 +29,13 @@ def wrd_ex(filename, out_file = None):
     if strs:
       # f.write("########## Strings ##########\n\n")
       for i, string in enumerate(strs):
-        f.write(string.encode("UTF-8"))
+        f.write(string.encode("utf-8"))
         f.write("\n\n")
     
     # if cmds:
     #   f.write("########## Commands ##########\n\n")
     #   for cmd in cmds:
-    #     f.write(cmd.encode("UTF-8"))
+    #     f.write(cmd.encode("utf-8"))
     #     f.write("\n")
     #   f.write("\n")
 
@@ -75,7 +73,7 @@ def wrd_ex_data(f):
     f.seek(off)
     for i in range(count):
       str_len = f.get_u8()
-      cmd = f.read(str_len).decode("UTF-8")
+      cmd = f.read(str_len).decode()
       f.read(1) # Null byte
       cmds.append(cmd)
   
@@ -90,8 +88,8 @@ def wrd_ex_data(f):
     if str_len >= 0x80:
       str_len += (f.get_u8() - 1) * 0x80
     
-    str = f.read(str_len).decode("UTF-16LE")
-    f.read(2) # Null byte
+    str = f.read(str_len).decode("utf-16le")
+    f.read(2) # Null bytes
     strs.append(str)
   
   return cmds, strs
@@ -188,7 +186,7 @@ if __name__ == "__main__":
       except:
         pass
       
-      print fn
+      print(fn)
       wrd_ex(fn, out_file)
 
 ### EOF ###

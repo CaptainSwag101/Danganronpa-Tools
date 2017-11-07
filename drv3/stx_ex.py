@@ -1,6 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-
-################################################################################
+﻿################################################################################
 # Copyright © 2016-2017 BlackDragonHunt
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To But It's Not My Fault Public
@@ -15,7 +13,7 @@ STX_MAGIC = "STXT"
 def stx_ex(filename, out_file = None):
   out_file = out_file or os.path.splitext(filename)[0] + ".txt"
   
-  f = BinaryFile(filename, "rb")
+  f = BinaryFile(open(filename, "rb"))
   strs = stx_ex_data(f)
   f.close()
   
@@ -32,14 +30,14 @@ def stx_ex(filename, out_file = None):
   with open(out_file, "wb") as f:
     for str_id, string in strs:
       f.write("##### %04d\n\n" % str_id)
-      f.write(string.encode("UTF-8"))
+      f.write(string.encode("utf-8"))
       f.write("\n\n")
 
 def stx_ex_data(f):
-  if not f.read(4) == STX_MAGIC:
+  if not f.read(4).decode() == STX_MAGIC:
     return []
   
-  lang      = f.read(4)   # "JPLL" in the JP version, at least.
+  lang      = f.read(4).decode()   # "JPLL" in the JP version
   unk       = f.get_u32() # Table count?
   table_off = f.get_u32()
   
@@ -55,7 +53,7 @@ def stx_ex_data(f):
     
     f.seek(str_off)
     
-    string = f.get_str(bytes_per_char = 2, encoding = "UTF-16LE")
+    string = f.get_str(bytes_per_char = 2, encoding = "utf-16le")
     strs.append((str_id, string))
   
   return strs
@@ -99,7 +97,7 @@ if __name__ == "__main__":
       except:
         pass
       
-      print fn
+      print(fn)
       stx_ex(fn, out_file)
 
 ### EOF ###

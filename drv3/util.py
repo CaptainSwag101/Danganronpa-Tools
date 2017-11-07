@@ -1,6 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-
-################################################################################
+﻿################################################################################
 # Copyright © 2016-2017 BlackDragonHunt
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To But It's Not My Fault Public
@@ -48,26 +46,24 @@ class BinaryHelper(object):
   def get_bin(self, length):
     return BinaryData(self.read(length))
   
-  def get_str(self, encoding = "utf-8"):
+  def get_str(self, bytes_per_char = 1, encoding = "utf-8"):
     bytes = bytearray()
     
     while True:
-      if encoding == "utf-16" or encoding == "unicode":
-        ch = self.read(2)
-        if ch[0] == 0 and ch[1] == 0:
+        ch = self.read(bytes_per_char)
+        zero = True
+        for i in range(len(ch)):
+          if not ch[i] == 0:
+            zero = False
+            break
+        
+        if zero == True:
           break
         else:
-          bytes.append(ch[0])
-          bytes.append(ch[1])
-      else:
-        ch = self.read(1)
-        if ch[0] == 0:
-          break
-        else:
-          bytes.append(ch[0])
+          for i in range(len(ch)):
+            bytes.append(ch[i])
     
     string = bytes.decode(encoding)
-    print(string)
     return string
 
 class BinaryFile(io.BufferedReader, BinaryHelper):
