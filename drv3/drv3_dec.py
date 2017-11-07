@@ -1,6 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-
-################################################################################
+﻿################################################################################
 # Copyright © 2016-2017 BlackDragonHunt
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To But It's Not My Fault Public
@@ -23,10 +21,13 @@ def spc_dec(data):
   data = bytearray(data)
   res = bytearray()
   
+  data_len = len(data)
+  #print("data_len: ", data_len)
+  
   flag = 1
   p = 0
   
-  while p < len(data):
+  while p < data_len:
     
     # We use an 8-bit flag to determine whether something's raw data
     # or if we pull from the buffer, going from most to least significant bit.
@@ -35,7 +36,7 @@ def spc_dec(data):
       flag = 0x100 | bit_reverse(data[p])
       p += 1
     
-    if p >= len(data):
+    if p >= data_len:
       break
     
     # Raw byte.
@@ -69,7 +70,7 @@ def spc_dec(data):
 # so for lack of a better term I'm just calling it srd compression. ┐(´∀｀)┌
 
 def srd_dec(filename):
-  f = BinaryFile(filename, "rb")
+  f = BinaryFile(open(filename, "rb"))
   res = srd_dec_data(f)
   f.close()
   return res
@@ -78,7 +79,7 @@ def srd_dec_data(f):
   res = bytearray()
   
   f.seek(0)
-  magic = f.read(4)
+  magic = f.read(4).decode()
   
   if not magic == "$CMP":
     f.seek(0)
@@ -93,7 +94,7 @@ def srd_dec_data(f):
   unk       = f.get_u32be()
   
   while True:
-    cmp_mode = f.read(4)
+    cmp_mode = f.read(4).decode()
     
     if not cmp_mode.startswith("$CL") and not cmp_mode == "$CR0":
       break

@@ -1,6 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-
-################################################################################
+﻿################################################################################
 # Copyright © 2016-2017 BlackDragonHunt
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To But It's Not My Fault Public
@@ -8,6 +6,7 @@
 # for more details.
 ################################################################################
 
+import io
 import os
 
 from util import *
@@ -18,7 +17,7 @@ TABLE_MAGIC = "Root"
 
 def spc_ex(filename, out_dir = None):
   out_dir = out_dir or os.path.splitext(filename)[0]
-  f = BinaryFile(filename, "rb")
+  f = BinaryFile(open(filename, "rb"))
   spc_ex_data(f, filename, out_dir)
   f.close()
 
@@ -29,17 +28,17 @@ def spc_ex_data(f, filename, out_dir):
   except:
     pass
   
-  magic = f.read(4)
+  magic = f.read(4).decode()
   
   if magic == "$CMP":
     dec = srd_dec_data(f)
     f.close()
-    f = BinaryString(dec)
+    f = BinaryData(dec)
     magic = f.read(4)
   
   if not magic == SPC_MAGIC:
     f.close()
-    print "Invalid SPC file."
+    print("Invalid SPC file.")
     return
   
   unk1 = f.read(0x24)
@@ -47,12 +46,12 @@ def spc_ex_data(f, filename, out_dir):
   unk2 = f.get_u32()
   f.read(0x10)
   
-  table_magic = f.read(4)
+  table_magic = f.read(4).decode()
   f.read(0x0C)
   
   if not table_magic == TABLE_MAGIC:
     f.close()
-    print "Invalid SPC file."
+    print("Invalid SPC file.")
     return
   
   for i in range(file_count):
@@ -69,12 +68,12 @@ def spc_ex_data(f, filename, out_dir):
     data_padding = (0x10 - cmp_size % 0x10) % 0x10
     
     # We don't actually want the null byte though, so pretend it's padding.
-    fn = f.read(name_len - 1)
+    fn = f.read(name_len - 1).decode()
     f.read(name_padding + 1)
     
-    # print
-    # print cmp_flag, unk_flag, cmp_size, dec_size,
-    # print fn
+    # print()
+    # print(cmp_flag, unk_flag, cmp_size, dec_size)
+    # print(fn)
     
     data = f.read(cmp_size)
     f.read(data_padding)
@@ -88,7 +87,7 @@ def spc_ex_data(f, filename, out_dir):
       data = spc_dec(data)
       
       if not len(data) == dec_size:
-        print "Size mismatch:", dec_size, len(data)
+        print("Size mismatch:", dec_size, len(data))
     
     # Load from an external file.
     elif cmp_flag == 0x03:
@@ -100,7 +99,7 @@ def spc_ex_data(f, filename, out_dir):
     
     if os.path.splitext(fn)[1].lower() == ".spc":
       subfile = os.path.join(out_dir, fn)
-      spc = BinaryString(data)
+      spc = BinaryData(data)
       spc_ex_data(spc, subfile, subfile)
     
     else:
@@ -126,9 +125,9 @@ if __name__ == "__main__":
     "partition_resident_win",
     
     # PC demo
-    "partition_data_win_demo",
-    "partition_data_win_demo_us",
-    "partition_data_win_demo_jp",
+    #"partition_data_win_demo",
+    #"partition_data_win_demo_us",
+    #"partition_data_win_demo_jp",
     "partition_resident_win_demo",
   ]
   
@@ -139,7 +138,7 @@ if __name__ == "__main__":
       
       out_dir = os.path.join("dec", fn)
       
-      print fn
+      print(fn)
       spc_ex(fn, out_dir)
 
 ### EOF ###

@@ -1,6 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-
-################################################################################
+﻿################################################################################
 # Copyright © 2016-2017 BlackDragonHunt
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To But It's Not My Fault Public
@@ -47,9 +45,9 @@ def query_utf(data, table_offset, index, name):
   old_pos = data.tell()
   data.seek(table_offset)
   
-  if not data.read(4) == UTF_MAGIC:
+  if not data.read(4).decode() == UTF_MAGIC:
     data.seek(old_pos)
-    print "Not a @UTF table at %d" % table_offset
+    print("Not a @UTF table at %d" % table_offset)
     return
   
   table_size        = data.get_u32be()
@@ -63,7 +61,7 @@ def query_utf(data, table_offset, index, name):
   row_width         = data.get_u16be()
   rows              = data.get_u32be()
   
-  # print table_size, schema_offset, rows_offset, str_table_offset, data_offset, table_name_string, columns, row_width, rows
+  #print(table_size, schema_offset, rows_offset, str_table_offset, data_offset, table_name_string, columns, row_width, rows)
   
   # This is hacky as fuck, but I need some way to get the number of rows out, lol
   if index == -1:
@@ -91,7 +89,7 @@ def query_utf(data, table_offset, index, name):
         data.read(1)
       else:
         data.seek(old_pos)
-        print "Unknown type for constant."
+        print("Unknown type for constant.")
         return
     
     schema_info.append((schema_type, col_name, const_offset))
@@ -103,13 +101,13 @@ def query_utf(data, table_offset, index, name):
   data.seek(str_table_start)
   str_table = data.get_bin(str_table_size)
   
-  # print str_table_start, str_table_size
+  #print(str_table_start, str_table_size)
   
   for i in range(index, rows):
     row_offset = table_offset + 8 + rows_offset + (i * row_width)
-    # print
-    # print "*" * 40
-    # print
+    #print()
+    #print("*" * 40)
+    #print()
     
     for j in range(columns):
       schema_type  = schema_info[j][0]
@@ -118,7 +116,7 @@ def query_utf(data, table_offset, index, name):
       
       str_table.seek(col_name)
       col_name = str_table.get_str()
-      # print col_name
+      #print(col_name)
       
       if const_offset >= 0:
         col_offset = const_offset
@@ -129,7 +127,7 @@ def query_utf(data, table_offset, index, name):
         value = 0
       else:
         data.seek(col_offset)
-        # print data.tell()
+        #print(data.tell())
         
         type_mask = schema_type & COLUMN_TYPE_MASK
         if type_mask == COLUMN_TYPE_STRING:
@@ -141,7 +139,7 @@ def query_utf(data, table_offset, index, name):
           vardata_offset = data.get_u32be()
           vardata_size   = data.get_u32be()
           
-          # print data_offset + 8 + table_offset + vardata_offset, vardata_size
+          #print(data_offset + 8 + table_offset + vardata_offset, vardata_size)
           
           if vardata_size:
             temp_pos = data.tell()
@@ -172,21 +170,21 @@ def query_utf(data, table_offset, index, name):
           value = data.get_u8()
         else:
           data.seek(old_pos)
-          print "Unknown normal type."
+          print("Unknown normal type.")
           return
         
         if const_offset < 0:
           row_offset = data.tell()
       ### endif ###
       
-      # print value
-      # print
+      #print(value)
+      #print()
       
       if col_name == name:
         data.seek(old_pos)
         return value
     
-    # break
+    #break
   
   data.seek(old_pos)
   return None

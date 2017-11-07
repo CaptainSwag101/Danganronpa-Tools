@@ -13,7 +13,7 @@ from awb_ex import *
 from query_utf import query_utf
 
 def parse_acb(filename):
-  f = BinaryFile(filename, "rb")
+  f = BinaryFile(open(filename, "rb"))
   
   awb_file = query_utf(f, 0, 0, "AwbFile")
   cue_name_table = query_utf(f, 0, 0, "CueNameTable")
@@ -26,10 +26,10 @@ def parse_acb(filename):
     cue_id   = query_utf(cue_name_table, 0, i, "CueIndex")
     cue_name = query_utf(cue_name_table, 0, i, "CueName")
     
-    # names.append((cue_id, cue_name))
+    #names.append((cue_id, cue_name))
     names.append(cue_name)
     
-    # print i, cue_id, cue_name
+    #print(i, cue_id, cue_name)
   
   f.close()
   return names, awb_file
@@ -57,7 +57,7 @@ if __name__ == "__main__":
       if not os.path.splitext(fn)[1].lower() == ".acb":
         continue
       
-      print fn
+      print(fn)
       names, awb_file = parse_acb(fn)
       
       basename = os.path.splitext(os.path.basename(fn))[0]
@@ -65,7 +65,7 @@ if __name__ == "__main__":
       
       if os.path.isfile(awb_path):
         out_dir = os.path.join("dec", base_dir + "-ex", "sound", basename + ".awb")
-        awb_file = BinaryFile(awb_path, "rb")
+        awb_file = BinaryFile(open(awb_path, "rb"))
       elif awb_file == None:
         continue
       else:
@@ -81,7 +81,7 @@ if __name__ == "__main__":
         name = names[id] + guess_ext(file_data)
         out_file = os.path.join(out_dir, name)
         
-        print out_file
+        print(out_file)
         with open(out_file, "wb") as f:
           f.write(file_data)
       

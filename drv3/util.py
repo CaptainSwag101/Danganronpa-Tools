@@ -8,9 +8,9 @@
 # for more details.
 ################################################################################
 
+import io
 import os
 import zlib
-import StringIO
 import struct
 
 class BinaryHelper(object):
@@ -46,29 +46,34 @@ class BinaryHelper(object):
     return to_s16be(self.read(2))
   
   def get_bin(self, length):
-    return BinaryString(self.read(length))
+    return BinaryData(self.read(length))
   
-  def get_str(self, bytes_per_char = 1, encoding = None):
-    bytes = []
+  def get_str(self, encoding = "utf-8"):
+    bytes = bytearray()
     
     while True:
-      ch = self.read(bytes_per_char)
-      if ch == "\x00" * bytes_per_char:
-        break
+      if encoding == "utf-16" or encoding == "unicode":
+        ch = self.read(2)
+        if ch[0] == 0 and ch[1] == 0:
+          break
+        else:
+          bytes.append(ch[0])
+          bytes.append(ch[1])
       else:
-        bytes.append(ch)
+        ch = self.read(1)
+        if ch[0] == 0:
+          break
+        else:
+          bytes.append(ch[0])
     
-    string = "".join(bytes)
-    
-    if encoding:
-      string = string.decode(encoding)
-    
+    string = bytes.decode(encoding)
+    print(string)
     return string
 
-class BinaryFile(file, BinaryHelper):
+class BinaryFile(io.BufferedReader, BinaryHelper):
   pass
 
-class BinaryString(StringIO.StringIO, BinaryHelper):
+class BinaryData(io.BytesIO, BinaryHelper):
   pass
 
 def to_u32(b):

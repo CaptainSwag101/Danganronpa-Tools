@@ -1,6 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-
-################################################################################
+﻿################################################################################
 # Copyright © 2016-2017 BlackDragonHunt
 # This work is free. You can redistribute it and/or modify it under the
 # terms of the Do What The Fuck You Want To But It's Not My Fault Public
@@ -15,7 +13,7 @@ RSCT_MAGIC = "RSCT"
 def rsct_ex(filename, out_file = None):
   out_file = out_file or os.path.splitext(filename)[0] + ".txt"
   
-  f = BinaryFile(filename, "rb")
+  f = BinaryFile(open(filename, "rb"))
   strs = rsct_ex_data(f)
   f.close()
   
@@ -31,11 +29,11 @@ def rsct_ex(filename, out_file = None):
   
   with open(out_file, "wb") as f:
     for i, string in enumerate(strs):
-      f.write(string.encode("UTF-8"))
+      f.write(string.encode("utf-8"))
       f.write("\n\n")
 
 def rsct_ex_data(f):
-  if not f.read(4) == RSCT_MAGIC:
+  if not f.read(4).decode() == RSCT_MAGIC:
     return []
   
   f.read(4) # Padding
@@ -97,7 +95,7 @@ if __name__ == "__main__":
       except:
         pass
       
-      print fn
+      print(fn)
       rsct_ex(fn, out_file)
 
 ### EOF ###

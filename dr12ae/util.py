@@ -48,7 +48,7 @@ class BinaryHelper(object):
   def get_bin(self, length):
     return BinaryString(self.read(length))
   
-  def get_str(self, bytes_per_char = 1, encoding = None):
+  def get_str(self, bytes_per_char = 1, encoding = "utf-8"):
     bytes = []
     
     while True:
