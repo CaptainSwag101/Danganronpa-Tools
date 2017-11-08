@@ -97,7 +97,7 @@ def spc_ex_data(f, filename, out_dir):
       raise Exception(fn + ": Unknown SPC compression flag 0x%02X" % cmp_flag)
     
     if os.path.splitext(fn)[1].lower() == ".spc":
-      subfile = os.path.join(out_dir, fn)
+      subfile = os.path.join(out_dir, os.path.splitext(fn)[0])
       spc = BinaryData(data)
       spc_ex_data(spc, subfile, subfile)
     
