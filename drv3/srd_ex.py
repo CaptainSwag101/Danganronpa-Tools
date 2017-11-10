@@ -46,6 +46,7 @@ def read_srd_item(f):
 ################################################################################
 
 def read_rsf(data, subdata):
+  
   unk1 = data.read(4) # 10 00 00 00 ???
   unk2 = data.read(4) # FB DB 32 01 ???
   unk3 = data.read(4) # 41 DC 32 01 ???
@@ -60,6 +61,7 @@ def power_of_two(x):
   return 2**(x-1).bit_length()
 
 def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
+  
   unk1        = data.get_u32() # 01 00 00 00
   swiz        = data.get_u16()
   disp_width  = data.get_u16()
@@ -80,7 +82,7 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
   name_offset = img_data.get_u32()
   
   mipmaps = []
-  for i in range(mipmap_count):
+  for i in xrange(mipmap_count):
     mipmap_start = img_data.get_u32() & 0x0FFFFFFF # idk wtf the top byte is doing
     mipmap_len   = img_data.get_u32()
     mipmap_unk1  = img_data.get_u32() # XX 00 00 00
@@ -97,10 +99,10 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
     pal_start, pal_len, _, _ = mipmaps.pop(palette_id)
   
   img_data.seek(name_offset)
-  name = img_data.get_str(encoding = "CP932")
+  name = img_data.get_str(encoding = "cp932")
   
-  print "%4d %4d %2d 0x%02X 0x%02X %3d %3d %3d" % (swiz, scanline, mipmap_count, fmt, unk2, palette, palette_id, unk5), name.encode("UTF-8")
-  # print "0x%02X %2d Mipmaps %3d %3d" % (fmt, mipmap_count, palette, palette_id), name.encode("UTF-8")
+  print name.encode("utf8"), "  %4d %4d %2d 0x%02X 0x%02X %3d %3d %3d" % (swiz, scanline, mipmap_count, fmt, unk2, palette, palette_id, unk5)
+  # print "0x%02X %2d Mipmaps %3d %3d" % (fmt, mipmap_count, palette, palette_id), name.encode("utf8")
   
   filename_base = os.path.splitext(filename)[0]
   img_filename = filename_base + ".srdv"
@@ -116,7 +118,7 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
   if not keep_mipmaps:
     mipmaps = mipmaps[:1]
   
-  for i in range(len(mipmaps)):
+  for i in xrange(len(mipmaps)):
     
     mipmap_name = os.path.splitext(name)[0]
     if len(mipmaps) > 1:
@@ -127,7 +129,7 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
       mipmap_start, mipmap_len, mipmap_unk1, mipmap_unk2 = mipmaps[i]
       f.seek(mipmap_start)
       img_data = bytearray(f.read(mipmap_len))
-      print "     %4d %4d 0x%08X 0x%08X" % (disp_width, disp_height, mipmap_start, mipmap_len)
+      print "    %4d %4d 0x%08X 0x%08X" % (disp_width, disp_height, mipmap_start, mipmap_len)
       
       pal_data = None
       if not pal_start is None:
@@ -234,6 +236,7 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
     # The game seems to handle BC5 differently than Pillow.
     # I'm not 100% sure this is right, but it seems to be based on what I've seen?
     if fmt == 0x14:
+      print "Fmt = 0x14"
       r, g, b, a = img.split()
       b = g.copy()
       a = Image.new("L", (width, height), 0xFF)
@@ -241,6 +244,7 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
     
     # Pillow doesn't handle 16-bit BGRA, so we have to swap the R and B channels.
     if fmt == 0x05:
+      print "Fmt = 0x05"
       r, g, b, a = img.split()
       img = Image.merge("RGBA", (b, g, r, a))
     
@@ -269,7 +273,7 @@ def srd_ex_data(f, filename, out_dir, crop = False):
   
   subdir = out_dir
   
-  while True:
+  while 1:
     
     data_type, data, subdata = read_srd_item(f)
     
@@ -299,7 +303,7 @@ def srd_ex_data(f, filename, out_dir, crop = False):
         if not name or not img:
           continue
         
-        # out_file = os.path.splitext(os.path.join(subdir, name))[0]
+        #out_file = os.path.splitext(os.path.join(subdir, name))[0]
         out_file = os.path.join(subdir, name)
         
         try:
@@ -314,8 +318,8 @@ def srd_ex_data(f, filename, out_dir, crop = False):
       pass
     
     # Resource information?
-    # elif data_type == "$RSI":
-    #   pass
+    #elif data_type == "$RSI":
+    #  pass
     
     # Vertex?
     elif data_type == "$VTX":
@@ -397,9 +401,7 @@ if __name__ == "__main__":
       out_dir = os.path.dirname(fn[len(dirname) + 1:])
       out_dir = os.path.join(dirname + "-ex", out_dir)
       
-      print
       print fn
-      print
       srd_ex(fn, out_dir, crop = True)
 
 ### EOF ###

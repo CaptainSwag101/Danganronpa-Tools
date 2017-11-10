@@ -72,7 +72,7 @@ def query_utf(data, table_offset, index, name):
   
   schema_info = []
   
-  for i in range(columns):
+  for i in xrange(columns):
     schema_type  = data.get_u8()
     col_name     = data.get_u32be()
     const_offset = -1
@@ -105,13 +105,13 @@ def query_utf(data, table_offset, index, name):
   
   # print str_table_start, str_table_size
   
-  for i in range(index, rows):
+  for i in xrange(index, rows):
     row_offset = table_offset + 8 + rows_offset + (i * row_width)
     # print
     # print "*" * 40
     # print
     
-    for j in range(columns):
+    for j in xrange(columns):
       schema_type  = schema_info[j][0]
       col_name     = schema_info[j][1]
       const_offset = schema_info[j][2]

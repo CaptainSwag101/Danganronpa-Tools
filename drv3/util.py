@@ -49,16 +49,16 @@ class BinaryHelper(object):
     return BinaryString(self.read(length))
   
   def get_str(self, bytes_per_char = 1, encoding = None):
-    bytes = []
+    bytes = bytearray()
     
-    while True:
+    while 1:
       ch = self.read(bytes_per_char)
       if ch == "\x00" * bytes_per_char:
         break
       else:
-        bytes.append(ch)
+        bytes.extend(ch)
     
-    string = "".join(bytes)
+    string = str(bytes)
     
     if encoding:
       string = string.decode(encoding)
@@ -116,20 +116,13 @@ def from_u32be(b):
 def from_u16be(b):
   return struct.pack(">H", b)
 
-def list_all_files(dirname):
+def list_all_files(path):
   
-  if not os.path.isdir(dirname):
-    return
-
-  for item in os.listdir(dirname):
-    full_path = os.path.join(dirname, item)
-  
-    if os.path.isfile(full_path):
-      yield full_path
-      
-    elif os.path.isdir(full_path):
-      for filename in list_all_files(full_path):
-        yield filename
+  files = [os.path.join(root, name)
+           for root, dirs, files in os.walk(path)
+           for name in files]
+  files.sort()
+  return files
 
 def zlib_inflate(data):
   decompress = zlib.decompressobj(

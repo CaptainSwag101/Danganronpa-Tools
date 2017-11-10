@@ -39,7 +39,7 @@ def stx_ex_data(f):
   if not f.read(4) == STX_MAGIC:
     return []
   
-  lang      = f.read(4)   # "JPLL" in the JP version, at least.
+  lang      = f.read(4)   # "JPLL" in the JP and US versions, at least.
   unk       = f.get_u32() # Table count?
   table_off = f.get_u32()
   
@@ -48,7 +48,7 @@ def stx_ex_data(f):
   
   strs = []
   
-  for i in range(count):
+  for i in xrange(count):
     f.seek(table_off + i * 8)
     str_id  = f.get_u32()
     str_off = f.get_u32()

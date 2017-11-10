@@ -20,14 +20,15 @@ def parse_acb(filename):
   
   rows = query_utf(cue_name_table, 0, -1, "")
   
-  names = []
+  names = dict()
   
-  for i in range(rows):
+  for i in xrange(rows):
     cue_id   = query_utf(cue_name_table, 0, i, "CueIndex")
     cue_name = query_utf(cue_name_table, 0, i, "CueName")
     
-    # names.append((cue_id, cue_name))
-    names.append(cue_name)
+    names[cue_id] = cue_name
+    #ids.append(cue_id)
+    #names.append(cue_name)
     
     # print i, cue_id, cue_name
   

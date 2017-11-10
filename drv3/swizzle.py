@@ -27,6 +27,7 @@
 # SOFTWARE.
 
 def Compact1By1(x):
+  
   x &= 0x55555555 # x = -f-e -d-c -b-a -9-8 -7-6 -5-4 -3-2 -1-0
   x = (x ^ (x >> 1)) & 0x33333333 # x = --fe --dc --ba --98 --76 --54 --32 --10
   x = (x ^ (x >> 2)) & 0x0f0f0f0f # x = ---- fedc ---- ba98 ---- 7654 ---- 3210
@@ -41,6 +42,7 @@ def DecodeMorton2Y(code):
   return Compact1By1(code >> 1)
 
 def PostProcessMortonUnswizzle(data, width, height, bytespp):
+  
   data = bytearray(data)
   unswizzled = bytearray(len(data))
   
@@ -50,7 +52,7 @@ def PostProcessMortonUnswizzle(data, width, height, bytespp):
   min = width if width < height else height
   k = int(math.log(min, 2))
   
-  for i in range(width * height):
+  for i in xrange(width * height):
     
     if height < width:
       j = i >> (2 * k) << (2 * k) \

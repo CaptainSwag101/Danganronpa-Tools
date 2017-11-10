@@ -31,7 +31,7 @@ def rsct_ex(filename, out_file = None):
   
   with open(out_file, "wb") as f:
     for i, string in enumerate(strs):
-      f.write(string.encode("UTF-8"))
+      f.write(string.encode("utf8"))
       f.write("\n\n")
 
 def rsct_ex_data(f):
@@ -45,7 +45,7 @@ def rsct_ex_data(f):
   
   strs = []
   
-  for i in range(count):
+  for i in xrange(count):
     f.seek(0x14 + i * 8)
     unk     = f.get_u32()
     str_off = f.get_u32()

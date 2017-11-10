@@ -11,13 +11,13 @@
 from util import *
 
 def wrd_ex(filename, out_file = None):
-  out_file = out_file or os.path.splitext(filename)[0] + ".txt"
   
+  out_file = out_file or os.path.splitext(filename)[0] + ".txt"
   f = BinaryFile(filename, "rb")
   cmds, strs = wrd_ex_data(f)
   f.close()
   
-  if not strs:# and not cmds:
+  if not strs and not cmds:
     return
   
   out_dir = os.path.dirname(out_file)
@@ -29,19 +29,20 @@ def wrd_ex(filename, out_file = None):
   
   with open(out_file, "wb") as f:
     if strs:
-      # f.write("########## Strings ##########\n\n")
+      f.write("########## Strings ##########\n\n")
       for i, string in enumerate(strs):
         f.write(string.encode("UTF-8"))
         f.write("\n\n")
     
-    # if cmds:
-    #   f.write("########## Commands ##########\n\n")
-    #   for cmd in cmds:
-    #     f.write(cmd.encode("UTF-8"))
-    #     f.write("\n")
-    #   f.write("\n")
+    if cmds:
+      f.write("########## Commands ##########\n\n")
+      for cmd in cmds:
+        f.write(cmd.encode("UTF-8"))
+        f.write("\n")
+      f.write("\n")
 
 def wrd_ex_data(f):
+  
   str_count  = f.get_u16()
   cmd1_count = f.get_u16()
   cmd2_count = f.get_u16()
@@ -73,25 +74,23 @@ def wrd_ex_data(f):
   
   for off, count in cmd_info:
     f.seek(off)
-    for i in range(count):
+    for i in xrange(count):
       str_len = f.get_u8()
-      cmd = f.read(str_len).decode("UTF-8")
-      f.read(1) # Null byte
+      cmd = f.get_str(encoding = "UTF-8")
       cmds.append(cmd)
   
   # Dialogue strings.
   strs = []
   
   f.seek(str_off)
-  for i in range(str_count):
+  for i in xrange(str_count):
     str_len = f.get_u8()
     
     # ┐(´∀｀)┌
     if str_len >= 0x80:
       str_len += (f.get_u8() - 1) * 0x80
     
-    str = f.read(str_len).decode("UTF-16LE")
-    f.read(2) # Null byte
+    str = f.get_str(bytes_per_char = 2, encoding = "UTF-16LE")
     strs.append(str)
   
   return cmds, strs
@@ -118,17 +117,19 @@ def wrd_ex_data(f):
     
   #   text.append(line)
   
-  # for i in range(len(strs)):
+  # for i in xrange(len(strs)):
   #   if not i in used:
   #     text.append(u"[UNUSED]\n" + strs[i])
 
 def wrd_parse(data):
+  
   lines   = []
   speaker = -1
   p       = 0
+  data_len = len(data)
   
   # We need a minimum of four bytes for a nametag or a text display command.
-  while p <= len(data) - 4:
+  while p <= data_len - 4:
     b = data[p]
     p += 1
     

@@ -50,18 +50,18 @@ def awb_ex_data(data):
   file_ids  = []
   file_ends = []
   
-  for i in range(num_entries):
+  for i in xrange(num_entries):
     file_id = data.get_u16()
     file_ids.append(file_id)
   
   header_end = data.get_u32()
-  for i in range(num_entries):
+  for i in xrange(num_entries):
     file_end = data.get_u32()
     file_ends.append(file_end)
   
   file_start = 0
   file_end   = header_end
-  for i in range(num_entries):
+  for i in xrange(num_entries):
     
     file_start = file_end
     if file_end % alignment > 0:
@@ -77,6 +77,7 @@ def awb_ex_data(data):
 ################################################################################
 
 def guess_ext(data):
+  
   if data[:4] == "RIFF":
     return ".at9"
   elif data[:4] == "VAGp":

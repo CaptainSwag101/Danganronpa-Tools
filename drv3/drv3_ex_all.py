@@ -23,9 +23,9 @@ if __name__ == "__main__":
   import argparse
   
   print
-  print "*****************************************************************"
-  print "* New Danganronpa V3 extractor, written by BlackDragonHunt.      "
-  print "*****************************************************************"
+  print "*************************************************************"
+  print "* New Danganronpa V3 extractor, written by BlackDragonHunt. *"
+  print "*************************************************************"
   print
   
   parser = argparse.ArgumentParser(description = "Extracts data used in New Danganronpa V3.")
@@ -72,6 +72,8 @@ if __name__ == "__main__":
       except:
         print "Failed to unpack", filename
     
+    print
+    
     # Now extract all the data we know how to from inside the SPC files.
     for filename in list_all_files(out_dir):
       ext = os.path.splitext(filename)[1].lower()
@@ -83,9 +85,7 @@ if __name__ == "__main__":
       ex_dir   = out_dir + "-ex" + ex_dir[len(out_dir):]
       txt_file = os.path.join(ex_dir, os.path.splitext(basename)[0] + ".txt")
       
-      print
       print "Extracting", filename
-      print
       
       if ext == ".rsct":
         rsct_ex(filename, txt_file)
@@ -100,7 +100,7 @@ if __name__ == "__main__":
       if ext == ".srd" or ext == ".stx":
         srd_ex(filename, ex_dir, crop = args.crop)
   
-  print
+  #print
   #raw_input("Press Enter to exit.")
 
 ### EOF ###

@@ -17,6 +17,7 @@ SPC_MAGIC   = "CPS."
 TABLE_MAGIC = "Root"
 
 def spc_ex(filename, out_dir = None):
+  
   out_dir = out_dir or os.path.splitext(filename)[0]
   f = BinaryFile(filename, "rb")
   spc_ex_data(f, filename, out_dir)
@@ -55,7 +56,7 @@ def spc_ex_data(f, filename, out_dir):
     print "Invalid SPC file."
     return
   
-  for i in range(file_count):
+  for i in xrange(file_count):
     
     cmp_flag = f.get_u16()
     unk_flag = f.get_u16()
