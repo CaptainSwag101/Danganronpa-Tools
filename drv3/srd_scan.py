@@ -290,10 +290,11 @@ def srd_ex_data(f, filename, out_dir, crop = False):
       # We don't seem to do any really complicated nesting, so ignoring this.
       pass
     
-    # Resource folder?
+    # Resource folder
     elif data_type == "$RSF":
-      subdir = read_rsf(data, subdata)
-      subdir = os.path.join(out_dir, subdir)
+      #subdir = read_rsf(data, subdata)
+      #subdir = os.path.join(out_dir, subdir)
+	  pass
     
     # Texture (srdv file)?
     elif data_type == "$TXR":
@@ -367,7 +368,7 @@ def srd_ex_data(f, filename, out_dir, crop = False):
       pass
     
     else:
-      print data_type
+      pass
     
 if __name__ == "__main__":
   dirs = [
@@ -396,7 +397,7 @@ if __name__ == "__main__":
   
   for dirname in dirs:
     for fn in list_all_files(dirname):
-      if not os.path.splitext(fn)[1].lower() in [".srd", ".stx"]:
+      if not os.path.splitext(fn)[1].lower() in [".srd", ".stx" ".san"]:
         continue
       
       out_dir = os.path.dirname(fn[len(dirname) + 1:])
