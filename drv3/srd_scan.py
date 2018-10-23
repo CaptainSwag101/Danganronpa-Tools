@@ -14,7 +14,7 @@ import math
 from util import *
 from swizzle import PostProcessMortonUnswizzle
 
-from PIL import Image
+# from PIL import Image
 
 def read_srd_item(f):
   
@@ -30,7 +30,7 @@ def read_srd_item(f):
   subdata_len = f.get_u32be()
   padding     = f.get_u32be()
   
-  # print data_type, data_len, subdata_len, padding
+  print data_type, data_len, subdata_len, padding
   
   data_padding = (0x10 - data_len % 0x10) % 0x10
   subdata_padding = (0x10 - subdata_len % 0x10) % 0x10
@@ -102,7 +102,7 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
   name = img_data.get_str(encoding = "cp932")
   
   print name.encode("utf8"), "  %4d %4d %2d 0x%02X 0x%02X %3d %3d %3d" % (swiz, scanline, mipmap_count, fmt, unk2, palette, palette_id, unk5)
-  # print "0x%02X %2d Mipmaps %3d %3d" % (fmt, mipmap_count, palette, palette_id), name.encode("utf8")
+  print "0x%02X %2d Mipmaps %3d %3d" % (fmt, mipmap_count, palette, palette_id), name.encode("utf8")
   
   filename_base = os.path.splitext(filename)[0]
   img_filename = filename_base + ".srdv"
@@ -231,7 +231,7 @@ def read_txr(data, subdata, filename, crop = False, keep_mipmaps = False):
       print "!!!", hex(fmt), "!!!"
       return []
     
-    img = Image.frombytes(mode, (width, height), bytes(img_data), decoder, arg)
+    # img = Image.frombytes(mode, (width, height), bytes(img_data), decoder, arg)
     
     # The game seems to handle BC5 differently than Pillow.
     # I'm not 100% sure this is right, but it seems to be based on what I've seen?
@@ -297,21 +297,22 @@ def srd_ex_data(f, filename, out_dir, crop = False):
     
     # Texture (srdv file)?
     elif data_type == "$TXR":
-      images = read_txr(data, subdata, filename, crop)
+	  pass
+      #images = read_txr(data, subdata, filename, crop)
       
-      for name, img in images:
-        if not name or not img:
-          continue
+      #for name, img in images:
+      #  if not name or not img:
+      #    continue
         
         #out_file = os.path.splitext(os.path.join(subdir, name))[0]
-        out_file = os.path.join(subdir, name)
+      #  out_file = os.path.join(subdir, name)
         
-        try:
-          os.makedirs(subdir)
-        except:
-          pass
+      #  try:
+      #    os.makedirs(subdir)
+      #  except:
+      #    pass
         
-        img.save(out_file)
+      #  img.save(out_file)
     
     # Texture information?
     elif data_type == "$TXI":
