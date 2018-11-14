@@ -14,10 +14,10 @@ def wrd_ex(filename, out_file = None):
 
   out_file = out_file or os.path.splitext(filename)[0] + ".txt"
   f = BinaryFile(filename, "rb")
-  cmds, strs = wrd_ex_data(f)
+  text = wrd_ex_data(f)
   f.close()
 
-  if not strs and not cmds:
+  if not text:
     return
 
   out_dir = os.path.dirname(out_file)
@@ -28,62 +28,49 @@ def wrd_ex(filename, out_file = None):
     pass
 
   with open(out_file, "wb") as f:
-    if strs:
-      f.write("########## Strings ##########\n\n")
-      for i, string in enumerate(strs):
+    if text:
+      f.write("########## Text ##########\n\n")
+      for string in text:
         f.write(string.encode("UTF-8"))
         f.write("\n\n")
 
-    if cmds:
-      f.write("########## Commands ##########\n\n")
-      for cmd in cmds:
-        f.write(cmd.encode("UTF-8"))
-        f.write("\n")
-      f.write("\n")
-
 def wrd_ex_data(f):
 
-  str_count  = f.get_u16()
-  label_count = f.get_u16()
-  cmd1_count = f.get_u16()
-  cmd2_count = f.get_u16()
-  unk        = f.get_u32() # Padding?
+  str_count       	= f.get_u16()
+  label_count     	= f.get_u16()
+  param_count 	  	= f.get_u16()
+  sublabel_count  	= f.get_u16() # Some labels are broken into smaller sections
+  unk 			  	= f.get_u32() # Padding?
 
   # idk
-  unk_off    = f.get_u32()
-  cmd2_off   = f.get_u32()
-  label_off   = f.get_u32()
-  cmd1_off   = f.get_u32()
-  str_off    = f.get_u32()
+  sublabel_off_ptr	= f.get_u32() # Pointer to sublabel offset table
+  label_off_ptr     = f.get_u32() # Pointer to label offset table
+  label_name_ptr   	= f.get_u32() # Pointer to plaintext label name list
+  param_ptr   		= f.get_u32() # Pointer to plaintext parameter list
+  str_ptr    		= f.get_u32() # Pointer to plaintext string list
 
   # Code section.
-  code = bytearray(f.read(unk_off - 0x20))
-
-  # Code strings.
-  cmd_info = [
-    (label_off, label_count),
-    (cmd1_off, cmd1_count),
-    # idk what's going on with cmd2 so I'll just ignore it.
-  ]
-
-  cmds = []
-
-  for off, count in cmd_info:
-    f.seek(off)
-    for i in xrange(count):
-      str_len = f.get_u8()
-      cmd = f.get_str(encoding = "UTF-8")
-      cmds.append(cmd)
-
+  code = bytearray(f.read(sublabel_off_ptr - 0x20))
+  
+  
+  # Plaintext parameters.
+  params = []
+  f.seek(param_ptr)
+  for i in xrange(param_count):
+    param_len = f.get_u8() + 1
+    param = f.get_str(bytes_per_char = 1, encoding = "UTF-8")
+    params.append(param)
+  
+  
   # Dialogue strings.
   strs = []
 
   # Text is stored externally.
-  if str_off == 0:
-    return cmds, None
+  if str_ptr == 0:
+    return None
 
 
-  f.seek(str_off)
+  f.seek(str_ptr)
   for i in xrange(str_count):
     str_len = f.get_u8()
 
@@ -94,33 +81,27 @@ def wrd_ex_data(f):
     str = f.get_str(bytes_per_char = 2, encoding = "UTF-16LE")
     strs.append(str)
 
-  return cmds, strs
-
-  # The IDs associated with each nametag seem to vary between files,
-  # and I'm not sure how they're determined, so I'm leaving this out for now.
 
   # Put it all together.
-  # lines = wrd_parse(code)
-  # text  = []
-  # used  = set()
+  lines = wrd_parse(code)
+  text  = []
+  used  = set()
 
-  # for speaker, line in lines:
-  #   used.add(line)
-  #   line = strs[line]
+  for speaker, line in lines:
+    used.add(line)
+    line = strs[line]
+    speaker = params[speaker]
 
-  #   if speaker in NAMETAGS:
-  #     speaker = NAMETAGS[speaker]
-  #   else:
-  #     speaker = "0x%04X" % speaker
+    if speaker:
+      line = u"[%s]\n%s" % (speaker, line)
 
-  #   if speaker:
-  #     line = u"[%s]\n%s" % (speaker, line)
+    text.append(line)
 
-  #   text.append(line)
-
-  # for i in xrange(len(strs)):
-  #   if not i in used:
-  #     text.append(u"[UNUSED]\n" + strs[i])
+  for i in xrange(len(strs)):
+    if not i in used:
+      text.append(u"[UNUSED]\n" + strs[i])
+	  
+  return text
 
 def wrd_parse(data):
 
@@ -140,12 +121,12 @@ def wrd_parse(data):
     cmd = data[p]
     p += 1
 
-    if cmd == 0x46 or cmd == 0x58:
+    if cmd == 0x46:
       line = to_u16be(data[p : p + 2])
       lines.append((speaker, line))
       p += 2
 
-    elif cmd == 0x1D or cmd == 0x53:
+    elif cmd == 0x1D:
       speaker = to_u16be(data[p : p + 2])
       p += 2
 
