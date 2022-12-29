@@ -10,94 +10,97 @@ from util import *
 
 STX_MAGIC = "STXT"
 
-def stx_ex(filename, out_file = None):
-  out_file = out_file or os.path.splitext(filename)[0] + ".txt"
-  
-  f = BinaryFile(open(filename, "rb"))
-  strs = stx_ex_data(f)
-  f.close()
-  
-  if not strs:
-    return
-  
-  out_dir = os.path.dirname(out_file)
-  
-  try:
-    os.makedirs(out_dir)
-  except:
-    pass
-  
-  with open(out_file, "w") as f:
-    for str_id, string in strs:
-      f.write("##### %04d\n\n" % str_id)
-      f.write(string)
-      f.write("\n\n")
+
+def stx_ex(filename, out_file=None):
+    out_file = out_file or os.path.splitext(filename)[0] + ".txt"
+
+    f = BinaryFile(open(filename, "rb"))
+    strs = stx_ex_data(f)
+    f.close()
+
+    if not strs:
+        return
+
+    out_dir = os.path.dirname(out_file)
+
+    try:
+        os.makedirs(out_dir)
+    except:
+        pass
+
+    with open(out_file, "w") as f:
+        for str_id, string in strs:
+            f.write("##### %04d\n\n" % str_id)
+            f.write(string)
+            f.write("\n\n")
+
 
 def stx_ex_data(f):
-  if not f.read(4).decode() == STX_MAGIC:
-    return []
-  
-  lang      = f.read(4).decode()   # "JPLL" in the JP version
-  unk       = f.get_u32() # Table count?
-  table_off = f.get_u32()
-  
-  unk2      = f.get_u32()
-  count     = f.get_u32()
-  
-  strs = []
-  
-  for i in range(count):
-    f.seek(table_off + i * 8)
-    str_id  = f.get_u32()
-    str_off = f.get_u32()
-    
-    f.seek(str_off)
-    
-    string = f.get_str(bytes_per_char = 2, encoding = "utf-16le")
-    strs.append((str_id, string))
-  
-  return strs
+    if not f.read(4).decode() == STX_MAGIC:
+        return []
+
+    lang = f.read(4).decode()  # "JPLL" in the JP version
+    unk = f.get_u32()  # Table count?
+    table_off = f.get_u32()
+
+    unk2 = f.get_u32()
+    count = f.get_u32()
+
+    strs = []
+
+    for i in range(count):
+        f.seek(table_off + i * 8)
+        str_id = f.get_u32()
+        str_off = f.get_u32()
+
+        f.seek(str_off)
+
+        string = f.get_str(bytes_per_char=2, encoding="utf-16le")
+        strs.append((str_id, string))
+
+    return strs
+
 
 if __name__ == "__main__":
-  dirs = [
-    # Vita retail
-    "dec/partition_data_vita",
-    "dec/partition_resident_vita",
-    "dec/partition_patch101_vita",
-    "dec/partition_patch102_vita",
-    
-    # Vita demo
-    "dec/partition_data_vita_taiken_ja",
-    "dec/partition_resident_vita_taiken_ja",
-    
-    # PC retail
-    "dec/partition_data_win",
-    "dec/partition_data_win_us",
-    "dec/partition_data_win_jp",
-    "dec/partition_resident_win",
-    
-    # PC demo
-    "dec/partition_data_win_demo",
-    "dec/partition_data_win_demo_us",
-    "dec/partition_data_win_demo_jp",
-    "dec/partition_resident_win_demo",
-  ]
-  
-  for dirname in dirs:
-    for fn in list_all_files(dirname):
-      if not os.path.splitext(fn)[1].lower() == ".stx":
-        continue
-      
-      out_dir, basename = os.path.split(fn)
-      out_dir  = dirname + "-ex" + out_dir[len(dirname):]
-      out_file = os.path.join(out_dir, os.path.splitext(basename)[0] + ".txt")
-      
-      try:
-        os.makedirs(out_dir)
-      except:
-        pass
-      
-      print(fn)
-      stx_ex(fn, out_file)
+    dirs = [
+        # Vita retail
+        "dec/partition_data_vita",
+        "dec/partition_resident_vita",
+        "dec/partition_patch101_vita",
+        "dec/partition_patch102_vita",
+
+        # Vita demo
+        "dec/partition_data_vita_taiken_ja",
+        "dec/partition_resident_vita_taiken_ja",
+
+        # PC retail
+        "dec/partition_data_win",
+        "dec/partition_data_win_us",
+        "dec/partition_data_win_jp",
+        "dec/partition_resident_win",
+
+        # PC demo
+        "dec/partition_data_win_demo",
+        "dec/partition_data_win_demo_us",
+        "dec/partition_data_win_demo_jp",
+        "dec/partition_resident_win_demo",
+    ]
+
+    for dirname in dirs:
+        for fn in list_all_files(dirname):
+            if not os.path.splitext(fn)[1].lower() == ".stx":
+                continue
+
+            out_dir, basename = os.path.split(fn)
+            out_dir = dirname + "-ex" + out_dir[len(dirname):]
+            out_file = os.path.join(out_dir, os.path.splitext(basename)[0] + ".txt")
+
+            try:
+                os.makedirs(out_dir)
+            except:
+                pass
+
+            print(fn)
+            stx_ex(fn, out_file)
 
 ### EOF ###
